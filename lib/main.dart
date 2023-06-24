@@ -46,10 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _connectDevice() {
-    _bluetoothPrint.connect(_device!).then((value) {
-      print(value);
-      print('connect done');
-    });
+    _bluetoothPrint.connect(_device!);
   }
 
   _print() async {
@@ -66,19 +63,17 @@ class _MyHomePageState extends State<MyHomePage> {
     List<int> imageBytes =
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
     String base64Image = base64Encode(imageBytes);
-    print(base64Image);
+
     list.add(LineText(
         type: LineText.TYPE_IMAGE,
         content: base64Image,
         align: LineText.ALIGN_CENTER,
-        width: 400,
-        height: 400,
+        width: 450,
+        height: 450,
         x: 10,
         y: 10,
         linefeed: 1));
-    await _bluetoothPrint.printReceipt(config, list).whenComplete(() {
-      print('print done');
-    });
+    await _bluetoothPrint.printReceipt(config, list);
     // list.add(LineText(
     //     type: LineText.TYPE_TEXT,
     //     content: 'this is conent left',
@@ -116,6 +111,7 @@ class _MyHomePageState extends State<MyHomePage> {
         case BluetoothPrint.CONNECTED:
           setState(() {
             _connected = true;
+            print('device state is connected');
           });
           break;
         case BluetoothPrint.DISCONNECTED:
@@ -138,8 +134,11 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(children: [
+          Image.asset(
+            'assets/print-logo.jpg',
+          ),
           ElevatedButton(
-              onPressed: _device == null ? null : _print,
+              onPressed: !_connected ? null : _print,
               child: const Text('Print')),
           ElevatedButton(
               onPressed: _device == null ? null : _connectDevice,
