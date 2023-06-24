@@ -1,5 +1,6 @@
+import 'package:bluetooth_print/bluetooth_print.dart';
+import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bluetooth_printer/flutter_bluetooth_printer_library.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,14 +32,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  ReceiptController? controller;
+  BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
+  bool _connected = false;
+  BluetoothDevice? _device;
+  _scanDevices() {
+    bluetoothPrint.startScan(timeout: const Duration(seconds: 3));
+  }
 
-  Future<void> print() async {
-    final device = await FlutterBluetoothPrinter.selectDevice(context);
-    if (device != null) {
-      /// do print
-      controller?.print(address: device.address);
-    }
+  @override
+  void initState() {
+    bluetoothPrint.state.listen((state) {
+      print('cur device status: $state');
+      switch (state) {
+        case BluetoothPrint.CONNECTED:
+          setState(() {
+            _connected = true;
+          });
+          break;
+        case BluetoothPrint.DISCONNECTED:
+          setState(() {
+            _connected = false;
+          });
+          break;
+        default:
+          break;
+      }
+    });
+    super.initState();
   }
 
   @override
@@ -48,18 +68,36 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Receipt(
-        builder: (context) => const Column(children: [
-          Text('Hello World'),
-        ]),
-        onInitialized: (controller) {
-          this.controller = controller;
-        },
-      ),
-      floatingActionButton: const FloatingActionButton(
-        onPressed: null,
+      body: Column(children: [
+        const Text('Hello'),
+        StreamBuilder<List<BluetoothDevice>>(
+          stream: bluetoothPrint.scanResults,
+          initialData: const [],
+          builder: (c, snapshot) => Column(
+            children: snapshot.data
+                ?.map((d) => ListTile(
+                      title: Text(d.name ?? ''),
+                      subtitle: Text(d.address ?? ''),
+                      onTap: () async {
+                        setState(() {
+                          _device = d;
+                        });
+                      },
+                      trailing: _device!.address == d.address
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.green,
+                            )
+                          : null,
+                    ))
+                .toList(),
+          ),
+        )
+      ]),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _scanDevices,
         tooltip: 'Scan',
-        child: Icon(Icons.scanner),
+        child: const Icon(Icons.search),
       ),
     );
   }
