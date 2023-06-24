@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:bluetooth_print/bluetooth_print.dart';
 import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,17 +35,83 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  BluetoothPrint bluetoothPrint = BluetoothPrint.instance;
-  bool _connected = false;
+  final BluetoothPrint _bluetoothPrint = BluetoothPrint.instance;
+
   BluetoothDevice? _device;
+
+  bool _connected = false;
+
   _scanDevices() {
-    bluetoothPrint.startScan(timeout: const Duration(seconds: 3));
+    _bluetoothPrint.startScan(timeout: const Duration(seconds: 3));
+  }
+
+  void _connectDevice() {
+    _bluetoothPrint.connect(_device!).then((value) {
+      print(value);
+      print('connect done');
+    });
+  }
+
+  _print() async {
+    Map<String, dynamic> config = {};
+    List<LineText> list = List.empty(growable: true);
+
+    list.add(LineText(
+        type: LineText.TYPE_TEXT,
+        content: 'A Title',
+        weight: 1,
+        align: LineText.ALIGN_CENTER,
+        linefeed: 1));
+    ByteData data = await rootBundle.load("assets/print-logo.jpg");
+    List<int> imageBytes =
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    String base64Image = base64Encode(imageBytes);
+    print(base64Image);
+    list.add(LineText(
+        type: LineText.TYPE_IMAGE,
+        content: base64Image,
+        align: LineText.ALIGN_CENTER,
+        width: 400,
+        height: 400,
+        x: 10,
+        y: 10,
+        linefeed: 1));
+    await _bluetoothPrint.printReceipt(config, list).whenComplete(() {
+      print('print done');
+    });
+    // list.add(LineText(
+    //     type: LineText.TYPE_TEXT,
+    //     content: 'this is conent left',
+    //     weight: 0,
+    //     align: LineText.ALIGN_LEFT,
+    //     linefeed: 1));
+    // list.add(LineText(
+    //     type: LineText.TYPE_TEXT,
+    //     content: 'this is conent right',
+    //     align: LineText.ALIGN_RIGHT,
+    //     linefeed: 1));
+    // list.add(LineText(linefeed: 1));
+    // list.add(LineText(
+    //     type: LineText.TYPE_BARCODE,
+    //     content: 'A12312112',
+    //     size: 10,
+    //     align: LineText.ALIGN_CENTER,
+    //     linefeed: 1));
+    // list.add(LineText(linefeed: 1));
+    // list.add(LineText(
+    //     type: LineText.TYPE_QRCODE,
+    //     content: 'qrcode i',
+    //     size: 10,
+    //     align: LineText.ALIGN_CENTER,
+    //     linefeed: 1));
+    // list.add(LineText(linefeed: 1));
   }
 
   @override
   void initState() {
-    bluetoothPrint.state.listen((state) {
-      print('cur device status: $state');
+    super.initState();
+
+    _bluetoothPrint.state.listen((state) {
       switch (state) {
         case BluetoothPrint.CONNECTED:
           setState(() {
@@ -58,7 +127,6 @@ class _MyHomePageState extends State<MyHomePage> {
           break;
       }
     });
-    super.initState();
   }
 
   @override
@@ -68,32 +136,39 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
       ),
-      body: Column(children: [
-        const Text('Hello'),
-        StreamBuilder<List<BluetoothDevice>>(
-          stream: bluetoothPrint.scanResults,
-          initialData: const [],
-          builder: (c, snapshot) => Column(
-            children: snapshot.data
-                ?.map((d) => ListTile(
-                      title: Text(d.name ?? ''),
-                      subtitle: Text(d.address ?? ''),
-                      onTap: () async {
-                        setState(() {
-                          _device = d;
-                        });
-                      },
-                      trailing: _device!.address == d.address
-                          ? const Icon(
-                              Icons.check,
-                              color: Colors.green,
-                            )
-                          : null,
-                    ))
-                .toList(),
-          ),
-        )
-      ]),
+      body: Center(
+        child: Column(children: [
+          ElevatedButton(
+              onPressed: _device == null ? null : _print,
+              child: const Text('Print')),
+          ElevatedButton(
+              onPressed: _device == null ? null : _connectDevice,
+              child: const Text('Connect')),
+          StreamBuilder<List<BluetoothDevice>>(
+            stream: _bluetoothPrint.scanResults,
+            initialData: const [],
+            builder: (c, snapshot) => Column(
+                children: snapshot.data
+                        ?.map((d) => ListTile(
+                              title: Text(d.name ?? ''),
+                              subtitle: Text(d.address ?? ''),
+                              onTap: () async {
+                                setState(() {
+                                  _device = d;
+                                });
+                              },
+                              trailing: _device?.address == d.address
+                                  ? const Icon(
+                                      Icons.check,
+                                      color: Colors.green,
+                                    )
+                                  : null,
+                            ))
+                        .toList() ??
+                    []),
+          )
+        ]),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _scanDevices,
         tooltip: 'Scan',
