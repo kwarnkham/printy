@@ -158,6 +158,86 @@ class _MyHomePageState extends State<MyHomePage> {
                           )
                         ],
                       ),
+                      Container(
+                        color: Colors.black,
+                        height: 1,
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(top: 4, bottom: 4),
+                        child: const Text('_'),
+                      ),
+                      const Row(
+                        children: [
+                          Expanded(
+                            flex: 4,
+                            child: Text(
+                              'Name',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              'Price',
+                              textAlign: TextAlign.end,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              'Qty',
+                              textAlign: TextAlign.end,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text(
+                              'Amount',
+                              textAlign: TextAlign.end,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        color: Colors.black,
+                        height: 1,
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(top: 4, bottom: 4),
+                        child: const Text('_'),
+                      ),
+                      ..._order['a_items'].map((item) {
+                        return Container(
+                          padding: const EdgeInsets.only(top: 2, bottom: 2),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 4,
+                                child: Text(item['name']),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  item['pivot']['price'].toString(),
+                                  textAlign: TextAlign.end,
+                                ),
+                              ),
+                              Expanded(
+                                  child: Text(
+                                      item['pivot']['quantity'].toString(),
+                                      textAlign: TextAlign.end)),
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                    (item['pivot']['price'] *
+                                            item['pivot']['quantity'])
+                                        .toString(),
+                                    textAlign: TextAlign.end),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList()
                     ],
                   ),
                 ),
