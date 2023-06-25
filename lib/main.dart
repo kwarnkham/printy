@@ -38,6 +38,16 @@ class _MyHomePageState extends State<MyHomePage> {
   final BluetoothPrint _bluetoothPrint = BluetoothPrint.instance;
 
   BluetoothDevice? _device;
+  dynamic _order;
+
+  Future<void> readJson() async {
+    final String response = await rootBundle.loadString('assets/data.json');
+    final data = await json.decode(response);
+
+    setState(() {
+      _order = data;
+    });
+  }
 
   bool _connected = false;
 
@@ -50,30 +60,30 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _print() async {
-    Map<String, dynamic> config = {};
-    List<LineText> list = List.empty(growable: true);
+    // Map<String, dynamic> config = {};
+    // List<LineText> list = List.empty(growable: true);
 
-    list.add(LineText(
-        type: LineText.TYPE_TEXT,
-        content: 'A Title',
-        weight: 1,
-        align: LineText.ALIGN_CENTER,
-        linefeed: 1));
-    ByteData data = await rootBundle.load("assets/print-logo.jpg");
-    List<int> imageBytes =
-        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-    String base64Image = base64Encode(imageBytes);
+    // list.add(LineText(
+    //     type: LineText.TYPE_TEXT,
+    //     content: 'A Title',
+    //     weight: 1,
+    //     align: LineText.ALIGN_CENTER,
+    //     linefeed: 1));
+    // ByteData data = await rootBundle.load("assets/print-logo.jpg");
+    // List<int> imageBytes =
+    //     data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    // String base64Image = base64Encode(imageBytes);
 
-    list.add(LineText(
-        type: LineText.TYPE_IMAGE,
-        content: base64Image,
-        align: LineText.ALIGN_CENTER,
-        width: 450,
-        height: 450,
-        x: 10,
-        y: 10,
-        linefeed: 1));
-    await _bluetoothPrint.printReceipt(config, list);
+    // list.add(LineText(
+    //     type: LineText.TYPE_IMAGE,
+    //     content: base64Image,
+    //     align: LineText.ALIGN_CENTER,
+    //     width: 450,
+    //     height: 450,
+    //     x: 10,
+    //     y: 10,
+    //     linefeed: 1));
+    // await _bluetoothPrint.printReceipt(config, list);
     // list.add(LineText(
     //     type: LineText.TYPE_TEXT,
     //     content: 'this is conent left',
@@ -105,7 +115,6 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-
     _bluetoothPrint.state.listen((state) {
       switch (state) {
         case BluetoothPrint.CONNECTED:
@@ -123,6 +132,8 @@ class _MyHomePageState extends State<MyHomePage> {
           break;
       }
     });
+
+    readJson();
   }
 
   @override
@@ -134,9 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(children: [
-          Image.asset(
-            'assets/print-logo.jpg',
-          ),
+          Image.network(_order.logo),
           ElevatedButton(
               onPressed: !_connected ? null : _print,
               child: const Text('Print')),

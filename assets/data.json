@@ -1,0 +1,220 @@
+{
+  "order": {
+    "id": 625,
+    "amount": 159020,
+    "discount": 0,
+    "status": 3,
+    "customer": "\u1018\u102c\u1038\u1021\u1036",
+    "phone": null,
+    "address": null,
+    "note": null,
+    "paid": 159020,
+    "created_at": "2023-06-22T04:02:07.000000Z",
+    "updated_at": "2023-06-22T04:02:07.000000Z",
+    "user_id": 1,
+    "updated_by": 1,
+    "logo": "https://taetaetin-api.book-mm.com/storage/taetaetin/assets/print-logo.png",
+    "logo_phone": "\ud835\udfe2\ud835\udfeb-\ud835\udfe9\ud835\udfeb\ud835\udfea \ud835\udfea\ud835\udfe2\ud835\udfea\ud835\udfea\ud835\udfe4\ud835\udfe2, \ud835\udfe2\ud835\udfeb-\ud835\udfe9\ud835\udfe8\ud835\udfe2\ud835\udfe3\ud835\udfe6\ud835\udfe5\ud835\udfe7\ud835\udfe9\ud835\udfea",
+    "a_items": [
+      {
+        "id": 85,
+        "name": "\u1001\u103c\u1004\u103a\u1006\u1031\u1038\u1001\u103d\u1000\u103a",
+        "stock": 0,
+        "price": 700,
+        "note": null,
+        "type": 2,
+        "status": 1,
+        "created_at": "2023-06-14T04:31:12.000000Z",
+        "updated_at": "2023-06-14T04:31:12.000000Z",
+        "pivot": {
+          "order_id": 625,
+          "a_item_id": 85,
+          "price": 700,
+          "quantity": 50,
+          "name": "\u1001\u103c\u1004\u103a\u1006\u1031\u1038\u1001\u103d\u1000\u103a",
+          "discount": 0,
+          "purchase_price": 700,
+          "created_at": "2023-06-22T04:02:07.000000Z",
+          "updated_at": "2023-06-22T04:02:07.000000Z"
+        }
+      },
+      {
+        "id": 86,
+        "name": "\u1021\u102f\u1014\u103a\u1038\u1019\u103e\u102f\u1010\u103a\u1001\u103d\u1000\u103a",
+        "stock": 0,
+        "price": 1800,
+        "note": null,
+        "type": 2,
+        "status": 1,
+        "created_at": "2023-06-14T14:35:41.000000Z",
+        "updated_at": "2023-06-14T14:35:41.000000Z",
+        "pivot": {
+          "order_id": 625,
+          "a_item_id": 86,
+          "price": 1800,
+          "quantity": 10,
+          "name": "\u1021\u102f\u1014\u103a\u1038\u1019\u103e\u102f\u1010\u103a\u1001\u103d\u1000\u103a",
+          "discount": 0,
+          "purchase_price": 1800,
+          "created_at": "2023-06-22T04:02:07.000000Z",
+          "updated_at": "2023-06-22T04:02:07.000000Z"
+        }
+      },
+      {
+        "id": 87,
+        "name": "12\u101c \u101b\u102c\u101e\u102e \u101d\u102b\u1038 bookmark",
+        "stock": 0,
+        "price": 720,
+        "note": null,
+        "type": 2,
+        "status": 1,
+        "created_at": "2023-06-14T14:36:31.000000Z",
+        "updated_at": "2023-06-14T14:36:31.000000Z",
+        "pivot": {
+          "order_id": 625,
+          "a_item_id": 87,
+          "price": 720,
+          "quantity": 36,
+          "name": "12\u101c \u101b\u102c\u101e\u102e \u101d\u102b\u1038 bookmark",
+          "discount": 0,
+          "purchase_price": 720,
+          "created_at": "2023-06-22T04:02:07.000000Z",
+          "updated_at": "2023-06-22T04:02:07.000000Z"
+        }
+      },
+      {
+        "id": 88,
+        "name": "\u1021\u1016\u102f\u1036\u1038\u1015\u102b \u101d\u102b\u1038\u200c\u101b\u1031\u1001\u103d\u1000\u103a",
+        "stock": 0,
+        "price": 3500,
+        "note": null,
+        "type": 2,
+        "status": 1,
+        "created_at": "2023-06-14T14:37:51.000000Z",
+        "updated_at": "2023-06-14T14:42:23.000000Z",
+        "pivot": {
+          "order_id": 625,
+          "a_item_id": 88,
+          "price": 3500,
+          "quantity": 4,
+          "name": "\u1021\u1016\u102f\u1036\u1038\u1015\u102b \u101d\u102b\u1038\u200c\u101b\u1031\u1001\u103d\u1000\u103a",
+          "discount": 0,
+          "purchase_price": 3500,
+          "created_at": "2023-06-22T04:02:07.000000Z",
+          "updated_at": "2023-06-22T04:02:07.000000Z"
+        }
+      },
+      {
+        "id": 48,
+        "name": "\u101d\u102b\u1038\u1005\u102f\u1017\u1030\u1038 Small",
+        "stock": 0,
+        "price": 3500,
+        "note": null,
+        "type": 2,
+        "status": 1,
+        "created_at": "2023-05-05T10:38:59.000000Z",
+        "updated_at": "2023-05-05T10:38:59.000000Z",
+        "pivot": {
+          "order_id": 625,
+          "a_item_id": 48,
+          "price": 3500,
+          "quantity": 10,
+          "name": "\u101d\u102b\u1038\u1005\u102f\u1017\u1030\u1038 Small",
+          "discount": 700,
+          "purchase_price": 3500,
+          "created_at": "2023-06-22T04:02:07.000000Z",
+          "updated_at": "2023-06-22T04:02:07.000000Z"
+        }
+      },
+      {
+        "id": 50,
+        "name": "\u101d\u102b\u1038\u1005\u102f\u1017\u1030\u1038 L Size",
+        "stock": 0,
+        "price": 14500,
+        "note": null,
+        "type": 2,
+        "status": 1,
+        "created_at": "2023-05-05T10:38:59.000000Z",
+        "updated_at": "2023-05-05T10:38:59.000000Z",
+        "pivot": {
+          "order_id": 625,
+          "a_item_id": 50,
+          "price": 14500,
+          "quantity": 1,
+          "name": "\u101d\u102b\u1038\u1005\u102f\u1017\u1030\u1038 L Size",
+          "discount": 6500,
+          "purchase_price": 14500,
+          "created_at": "2023-06-22T04:02:07.000000Z",
+          "updated_at": "2023-06-22T04:02:07.000000Z"
+        }
+      },
+      {
+        "id": 84,
+        "name": "\u101d\u102b\u1038\u1001\u103d\u1000\u103a\u101c\u103d\u1010\u103a",
+        "stock": 0,
+        "price": 2600,
+        "note": null,
+        "type": 2,
+        "status": 1,
+        "created_at": "2023-06-14T03:59:56.000000Z",
+        "updated_at": "2023-06-14T03:59:56.000000Z",
+        "pivot": {
+          "order_id": 625,
+          "a_item_id": 84,
+          "price": 2600,
+          "quantity": 3,
+          "name": "\u101d\u102b\u1038\u1001\u103d\u1000\u103a\u101c\u103d\u1010\u103a",
+          "discount": 400,
+          "purchase_price": 2600,
+          "created_at": "2023-06-22T04:02:07.000000Z",
+          "updated_at": "2023-06-22T04:02:07.000000Z"
+        }
+      },
+      {
+        "id": 62,
+        "name": "\u1001\u103d\u1000\u103a\u1015\u102f\u1036 Keychain",
+        "stock": 0,
+        "price": 750,
+        "note": null,
+        "type": 2,
+        "status": 1,
+        "created_at": "2023-05-05T10:38:59.000000Z",
+        "updated_at": "2023-05-05T10:38:59.000000Z",
+        "pivot": {
+          "order_id": 625,
+          "a_item_id": 62,
+          "price": 750,
+          "quantity": 25,
+          "name": "\u1001\u103d\u1000\u103a\u1015\u102f\u1036 Keychain",
+          "discount": 350,
+          "purchase_price": 750,
+          "created_at": "2023-06-22T04:02:07.000000Z",
+          "updated_at": "2023-06-22T04:02:07.000000Z"
+        }
+      },
+      {
+        "id": 75,
+        "name": "\u101d\u102b\u1038\u1006\u1031\u1038\u101c\u102d\u1015\u103a\u1015\u103c\u102c\u1001\u103d\u1000\u103a",
+        "stock": 0,
+        "price": 3000,
+        "note": null,
+        "type": 2,
+        "status": 1,
+        "created_at": "2023-05-24T03:51:30.000000Z",
+        "updated_at": "2023-05-29T08:46:59.000000Z",
+        "pivot": {
+          "order_id": 625,
+          "a_item_id": 75,
+          "price": 3000,
+          "quantity": 5,
+          "name": "\u101d\u102b\u1038\u1006\u1031\u1038\u101c\u102d\u1015\u103a\u1015\u103c\u102c\u1001\u103d\u1000\u103a",
+          "discount": 300,
+          "purchase_price": 3000,
+          "created_at": "2023-06-22T04:02:07.000000Z",
+          "updated_at": "2023-06-22T04:02:07.000000Z"
+        }
+      }
+    ],
+    "purchases": []
+  }
+}
