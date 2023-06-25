@@ -1,9 +1,9 @@
 import 'dart:convert';
-
 import 'package:bluetooth_print/bluetooth_print.dart';
 import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MyApp());
@@ -38,14 +38,14 @@ class _MyHomePageState extends State<MyHomePage> {
   final BluetoothPrint _bluetoothPrint = BluetoothPrint.instance;
 
   BluetoothDevice? _device;
-  dynamic _order;
+  Map<String, dynamic> _order = {};
 
   Future<void> readJson() async {
     final String response = await rootBundle.loadString('assets/data.json');
-    final data = await json.decode(response);
+    final data = json.decode(response);
 
     setState(() {
-      _order = data;
+      _order = data['order'];
     });
   }
 
@@ -59,58 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _bluetoothPrint.connect(_device!);
   }
 
-  _print() async {
-    // Map<String, dynamic> config = {};
-    // List<LineText> list = List.empty(growable: true);
-
-    // list.add(LineText(
-    //     type: LineText.TYPE_TEXT,
-    //     content: 'A Title',
-    //     weight: 1,
-    //     align: LineText.ALIGN_CENTER,
-    //     linefeed: 1));
-    // ByteData data = await rootBundle.load("assets/print-logo.jpg");
-    // List<int> imageBytes =
-    //     data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-    // String base64Image = base64Encode(imageBytes);
-
-    // list.add(LineText(
-    //     type: LineText.TYPE_IMAGE,
-    //     content: base64Image,
-    //     align: LineText.ALIGN_CENTER,
-    //     width: 450,
-    //     height: 450,
-    //     x: 10,
-    //     y: 10,
-    //     linefeed: 1));
-    // await _bluetoothPrint.printReceipt(config, list);
-    // list.add(LineText(
-    //     type: LineText.TYPE_TEXT,
-    //     content: 'this is conent left',
-    //     weight: 0,
-    //     align: LineText.ALIGN_LEFT,
-    //     linefeed: 1));
-    // list.add(LineText(
-    //     type: LineText.TYPE_TEXT,
-    //     content: 'this is conent right',
-    //     align: LineText.ALIGN_RIGHT,
-    //     linefeed: 1));
-    // list.add(LineText(linefeed: 1));
-    // list.add(LineText(
-    //     type: LineText.TYPE_BARCODE,
-    //     content: 'A12312112',
-    //     size: 10,
-    //     align: LineText.ALIGN_CENTER,
-    //     linefeed: 1));
-    // list.add(LineText(linefeed: 1));
-    // list.add(LineText(
-    //     type: LineText.TYPE_QRCODE,
-    //     content: 'qrcode i',
-    //     size: 10,
-    //     align: LineText.ALIGN_CENTER,
-    //     linefeed: 1));
-    // list.add(LineText(linefeed: 1));
-  }
+  _print() async {}
 
   @override
   void initState() {
@@ -120,7 +69,6 @@ class _MyHomePageState extends State<MyHomePage> {
         case BluetoothPrint.CONNECTED:
           setState(() {
             _connected = true;
-            print('device state is connected');
           });
           break;
         case BluetoothPrint.DISCONNECTED:
@@ -145,13 +93,82 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Center(
         child: Column(children: [
-          Image.network(_order.logo),
+          _order.isEmpty
+              ? const SizedBox()
+              : Container(
+                  width: 360.toDouble(),
+                  decoration: const BoxDecoration(color: Colors.white),
+                  child: Column(
+                    children: [
+                      Image.network(_order['logo']),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Row(children: [
+                              const Icon(Icons.person),
+                              Text(_order['customer'])
+                            ]),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                const Icon(Icons.phone),
+                                Text(_order['phone'])
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 1,
+                            child: Row(children: [
+                              const Icon(Icons.numbers),
+                              Text(_order['id'].toString())
+                            ]),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                const Icon(Icons.calendar_month),
+                                Flexible(
+                                    child: Text(
+                                  DateFormat('dd/MM/yyyy').format(
+                                      DateTime.parse(_order['created_at'])),
+                                  textAlign: TextAlign.right,
+                                ))
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_pin),
+                          Flexible(
+                            child: Text(_order['address']),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
           ElevatedButton(
-              onPressed: !_connected ? null : _print,
-              child: const Text('Print')),
+            onPressed: !_connected ? null : _print,
+            child: const Text('Print'),
+          ),
           ElevatedButton(
-              onPressed: _device == null ? null : _connectDevice,
-              child: const Text('Connect')),
+            onPressed: _device == null ? null : _connectDevice,
+            child: const Text('Connect'),
+          ),
           StreamBuilder<List<BluetoothDevice>>(
             stream: _bluetoothPrint.scanResults,
             initialData: const [],
