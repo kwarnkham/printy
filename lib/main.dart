@@ -65,13 +65,27 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Uint8List? _pngData;
+  bool _printing = false;
 
   _print() async {
+    Map<String, dynamic> config = {};
+    List<LineText> list = List.empty(growable: true);
     Uint8List? data = await takePicture();
-    setState(() {
-      _pngData = data;
-    });
-    print(data);
+    String base64Image = base64Encode(data!);
+    list.add(
+      LineText(
+          type: LineText.TYPE_IMAGE,
+          content: base64Image,
+          align: LineText.ALIGN_CENTER,
+          width: 540,
+          linefeed: 1),
+    );
+    _printing = true;
+    await _bluetoothPrint
+        .printReceipt(config, list)
+        .whenComplete(() => setState(() {
+              _printing = false;
+            }));
   }
 
   @override
@@ -108,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<Uint8List?> takePicture() async {
     RenderRepaintBoundary boundary =
         _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    ui.Image image = await boundary.toImage(pixelRatio: 4);
+    ui.Image image = await boundary.toImage(pixelRatio: 2);
 
     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     Uint8List? pngBytes = byteData?.buffer.asUint8List();
@@ -438,7 +452,11 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           _pngData == null ? const SizedBox() : Image.memory(_pngData!),
           ElevatedButton(
-            onPressed: !_connected ? null : _print,
+            onPressed: !_connected
+                ? null
+                : _printing
+                    ? null
+                    : _print,
             child: const Text('Print'),
           ),
           ElevatedButton(
