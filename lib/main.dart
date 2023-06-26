@@ -48,6 +48,9 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {}
   }
 
+  final TextEditingController _inputController =
+      TextEditingController(text: '');
+
   int _size = 560;
   int _quantity = 2;
 
@@ -260,6 +263,31 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       )
                       .toList(),
+                ),
+                TextField(
+                  controller: _inputController,
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
+                  decoration: const InputDecoration(
+                    hintText: 'Print Data',
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        try {
+                          Map<String, dynamic> result =
+                              json.decode(_inputController.text);
+                          print(result);
+                        } on FormatException {
+                          print(_inputController.text);
+                        }
+                      },
+                      icon: const Icon(Icons.add_sharp),
+                    )
+                  ],
                 ),
                 StreamBuilder<List<BluetoothDevice>>(
                   stream: _bluetoothPrint.scanResults,
