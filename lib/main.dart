@@ -48,6 +48,8 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {}
   }
 
+  int _size = 560;
+
   String _statusText = 'Disconnected';
 
   void reset(String text) {
@@ -101,7 +103,7 @@ class _MyHomePageState extends State<MyHomePage> {
             type: LineText.TYPE_IMAGE,
             content: base64Image,
             align: LineText.ALIGN_CENTER,
-            width: 540,
+            width: _size,
             linefeed: 1),
       );
 
@@ -194,6 +196,35 @@ class _MyHomePageState extends State<MyHomePage> {
                         : null,
                     child: const Text('Disconnect'),
                   ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _size = 360;
+                      });
+                    },
+                    child: Text(
+                      '58mm',
+                      style: TextStyle(
+                          color: _size == 360 ? Colors.green : Colors.grey),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _size = 560;
+                      });
+                    },
+                    child: Text(
+                      '80mm',
+                      style: TextStyle(
+                          color: _size == 560 ? Colors.green : Colors.grey),
+                    ),
+                  )
                 ],
               ),
               StreamBuilder<List<BluetoothDevice>>(

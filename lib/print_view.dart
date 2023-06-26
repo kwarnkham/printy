@@ -110,13 +110,7 @@ class _PrintViewState extends State<PrintView> {
                       )
                     ],
                   ),
-                  Container(
-                    color: Colors.black,
-                    height: 1,
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(top: 4, bottom: 4),
-                    child: const Text('_'),
-                  ),
+                  const Divider(),
                   const Row(
                     children: [
                       Expanded(
@@ -151,13 +145,7 @@ class _PrintViewState extends State<PrintView> {
                       ),
                     ],
                   ),
-                  Container(
-                    color: Colors.black,
-                    height: 1,
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(top: 4, bottom: 4),
-                    child: const Text('_'),
-                  ),
+                  const Divider(),
                   ..._order['a_items'].map((item) {
                     return Container(
                       padding: const EdgeInsets.only(top: 2, bottom: 2),
@@ -198,13 +186,7 @@ class _PrintViewState extends State<PrintView> {
                       ),
                     );
                   }).toList(),
-                  Container(
-                    color: Colors.black,
-                    height: 1,
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(top: 4, bottom: 4),
-                    child: const Text('_'),
-                  ),
+                  const Divider(),
                   Container(
                     padding: const EdgeInsets.only(top: 2, bottom: 2),
                     child: Row(
@@ -245,13 +227,7 @@ class _PrintViewState extends State<PrintView> {
                       ],
                     ),
                   ),
-                  Container(
-                    color: Colors.black,
-                    height: 1,
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(top: 4, bottom: 4),
-                    child: const Text('_'),
-                  ),
+                  const Divider(),
                   Container(
                     padding: const EdgeInsets.only(top: 2, bottom: 2),
                     child: Row(
@@ -290,13 +266,7 @@ class _PrintViewState extends State<PrintView> {
                       ],
                     ),
                   ),
-                  Container(
-                    color: Colors.black,
-                    height: 1,
-                    width: double.infinity,
-                    margin: const EdgeInsets.only(top: 4, bottom: 4),
-                    child: const Text('_'),
-                  ),
+                  const Divider(),
                   Container(
                     padding: const EdgeInsets.only(top: 2, bottom: 2),
                     child: Row(
