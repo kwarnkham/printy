@@ -49,6 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   int _size = 560;
+  int _quantity = 2;
 
   String _statusText = 'Disconnected';
 
@@ -64,7 +65,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<Uint8List?> takePicture() async {
     RenderRepaintBoundary boundary =
         _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    ui.Image image = await boundary.toImage(pixelRatio: 4);
+    ui.Image image = await boundary.toImage(pixelRatio: _quantity.toDouble());
 
     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     Uint8List? pngBytes = byteData?.buffer.asUint8List();
@@ -108,6 +109,12 @@ class _MyHomePageState extends State<MyHomePage> {
       );
 
       await _bluetoothPrint.printReceipt({}, list);
+
+      Timer(const Duration(seconds: 6), () {
+        setState(() {
+          _printing = false;
+        });
+      });
     });
   }
 
@@ -158,122 +165,150 @@ class _MyHomePageState extends State<MyHomePage> {
             _bluetoothPrint.startScan(timeout: const Duration(seconds: 4)),
         child: SingleChildScrollView(
           child: Center(
-            child: Column(children: [
-              PrintView(globalKey: _globalKey),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [Text(_statusText)],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _printing
-                      ? ElevatedButton(
+            child: SizedBox(
+              width: 360.toDouble(),
+              child: Column(children: [
+                PrintView(globalKey: _globalKey),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [Text(_statusText)],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    _printing
+                        ? ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _printing = false;
+                              });
+                            },
+                            child: const Text('Finish'))
+                        : ElevatedButton(
+                            onPressed: !_connected ? null : _print,
+                            child: const Text('Print'),
+                          ),
+                    ElevatedButton(
+                      onPressed: _device != null && _device!.address != null
+                          ? _connectDevice
+                          : null,
+                      child: const Text('Connect'),
+                    ),
+                    ElevatedButton(
+                      onPressed: _connected
+                          ? () async {
+                              setState(() {
+                                _device = null;
+                              });
+                              await _bluetoothPrint.disconnect();
+                            }
+                          : null,
+                      child: const Text('Disconnect'),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _size = 360;
+                        });
+                      },
+                      child: Text(
+                        '58mm',
+                        style: TextStyle(
+                            color: _size == 360 ? Colors.green : Colors.grey),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _size = 560;
+                        });
+                      },
+                      child: Text(
+                        '80mm',
+                        style: TextStyle(
+                            color: _size == 560 ? Colors.green : Colors.grey),
+                      ),
+                    )
+                  ],
+                ),
+                const Center(
+                  child: Text('Quality'),
+                ),
+                Wrap(
+                  spacing: 10,
+                  children: [2, 4, 6, 8, 10, 12]
+                      .map(
+                        (e) => ElevatedButton(
+                          style: ElevatedButton.styleFrom(),
                           onPressed: () {
                             setState(() {
-                              _printing = false;
+                              _quantity = e;
                             });
                           },
-                          child: const Text('Finish'))
-                      : ElevatedButton(
-                          onPressed: !_connected ? null : _print,
-                          child: const Text('Print'),
+                          child: Text(
+                            e.toString(),
+                            style: TextStyle(
+                                color: _quantity == e
+                                    ? Colors.green
+                                    : Colors.grey),
+                          ),
                         ),
-                  ElevatedButton(
-                    onPressed: _device != null && _device!.address != null
-                        ? _connectDevice
-                        : null,
-                    child: const Text('Connect'),
-                  ),
-                  ElevatedButton(
-                    onPressed: _connected
-                        ? () async {
-                            setState(() {
-                              _device = null;
-                            });
-                            await _bluetoothPrint.disconnect();
-                          }
-                        : null,
-                    child: const Text('Disconnect'),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _size = 360;
-                      });
-                    },
-                    child: Text(
-                      '58mm',
-                      style: TextStyle(
-                          color: _size == 360 ? Colors.green : Colors.grey),
-                    ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _size = 560;
-                      });
-                    },
-                    child: Text(
-                      '80mm',
-                      style: TextStyle(
-                          color: _size == 560 ? Colors.green : Colors.grey),
-                    ),
-                  )
-                ],
-              ),
-              StreamBuilder<List<BluetoothDevice>>(
-                stream: _bluetoothPrint.scanResults,
-                initialData: const [],
-                builder: (c, snapshot) => Column(
-                    children: snapshot.data
-                            ?.map((d) => ListTile(
-                                  title: Text(d.name ?? ''),
-                                  subtitle: Text(d.address ?? ''),
-                                  onTap: () async {
-                                    setState(() {
-                                      _device = d;
-                                    });
-                                  },
-                                  trailing: _device?.address == d.address
-                                      ? const Icon(
-                                          Icons.check,
-                                          color: Colors.green,
-                                        )
-                                      : null,
-                                ))
-                            .toList() ??
-                        []),
-              )
-            ]),
+                      )
+                      .toList(),
+                ),
+                StreamBuilder<List<BluetoothDevice>>(
+                  stream: _bluetoothPrint.scanResults,
+                  initialData: const [],
+                  builder: (c, snapshot) => Column(
+                      children: snapshot.data
+                              ?.map((d) => ListTile(
+                                    title: Text(d.name ?? ''),
+                                    subtitle: Text(d.address ?? ''),
+                                    onTap: () async {
+                                      setState(() {
+                                        _device = d;
+                                      });
+                                    },
+                                    trailing: _device?.address == d.address
+                                        ? const Icon(
+                                            Icons.check,
+                                            color: Colors.green,
+                                          )
+                                        : null,
+                                  ))
+                              .toList() ??
+                          []),
+                )
+              ]),
+            ),
           ),
         ),
       ),
-      floatingActionButton: StreamBuilder<bool>(
-        stream: _bluetoothPrint.isScanning,
-        initialData: false,
-        builder: (c, snapshot) {
-          if (snapshot.data == true) {
-            return FloatingActionButton(
-              onPressed: () => _bluetoothPrint.stopScan(),
-              backgroundColor: Colors.red,
-              child: const Icon(Icons.stop),
-            );
-          } else {
-            return FloatingActionButton(
-              child: const Icon(Icons.search),
-              onPressed: () => _bluetoothPrint.startScan(
-                timeout: const Duration(seconds: 4),
-              ),
-            );
-          }
-        },
-      ),
+      // floatingActionButton: StreamBuilder<bool>(
+      //   stream: _bluetoothPrint.isScanning,
+      //   initialData: false,
+      //   builder: (c, snapshot) {
+      //     if (snapshot.data == true) {
+      //       return FloatingActionButton(
+      //         onPressed: () => _bluetoothPrint.stopScan(),
+      //         backgroundColor: Colors.red,
+      //         child: const Icon(Icons.stop),
+      //       );
+      //     } else {
+      //       return FloatingActionButton(
+      //         child: const Icon(Icons.search),
+      //         onPressed: () => _bluetoothPrint.startScan(
+      //           timeout: const Duration(seconds: 4),
+      //         ),
+      //       );
+      //     }
+      //   },
+      // ),
     );
   }
 }

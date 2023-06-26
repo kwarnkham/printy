@@ -43,7 +43,6 @@ class _PrintViewState extends State<PrintView> {
       child: _order.isEmpty
           ? const SizedBox()
           : Container(
-              width: 360.toDouble(),
               decoration: const BoxDecoration(color: Colors.white),
               child: Column(
                 children: [
