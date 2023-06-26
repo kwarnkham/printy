@@ -47,7 +47,18 @@ class _MyHomePageState extends State<MyHomePage> {
     } else {}
   }
 
+  String _statusText = 'Disconnected';
+
   bool _printing = false;
+
+  void reset(String text) {
+    setState(() {
+      _statusText = text;
+      _bluetoothPrint.disconnect();
+      _connected = false;
+      _device = null;
+    });
+  }
 
   Future<Uint8List?> takePicture() async {
     RenderRepaintBoundary boundary =
@@ -60,6 +71,23 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _print() async {
+    bool isAvailable = await _bluetoothPrint.isAvailable;
+    if (!isAvailable) {
+      return reset('Printer is not available');
+    }
+
+    bool isConnected = await _bluetoothPrint.isConnected ?? false;
+    if (!isConnected) {
+      setState(() {
+        return reset('Printer is not connected');
+      });
+    }
+
+    bool isOn = await _bluetoothPrint.isOn;
+    if (!isOn) {
+      return reset('Printer is on');
+    }
+
     Uint8List? data = await takePicture();
     Map<String, dynamic> config = {};
     List<LineText> list = List.empty(growable: true);
@@ -91,14 +119,14 @@ class _MyHomePageState extends State<MyHomePage> {
         case BluetoothPrint.CONNECTED:
           setState(() {
             _connected = true;
-          });
-          break;
-        case BluetoothPrint.DISCONNECTED:
-          setState(() {
-            _connected = false;
+            _statusText = 'Connected';
           });
           break;
         default:
+          setState(() {
+            _connected = false;
+          });
+          _bluetoothPrint.disconnect();
           break;
       }
     });
@@ -115,6 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) => initBluetooth());
   }
 
@@ -128,6 +157,10 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Center(
             child: Column(children: [
               PrintView(globalKey: _globalKey),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [Text(_statusText)],
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
@@ -148,6 +181,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   ElevatedButton(
                     onPressed: _connected
                         ? () async {
+                            setState(() {
+                              _device = null;
+                            });
                             await _bluetoothPrint.disconnect();
                           }
                         : null,
