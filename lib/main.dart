@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:bluetooth_print/bluetooth_print.dart';
 import 'package:bluetooth_print/bluetooth_print_model.dart';
@@ -49,8 +50,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String _statusText = 'Disconnected';
 
-  bool _printing = false;
-
   void reset(String text) {
     setState(() {
       _statusText = text;
@@ -63,12 +62,14 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<Uint8List?> takePicture() async {
     RenderRepaintBoundary boundary =
         _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
-    ui.Image image = await boundary.toImage(pixelRatio: 2);
+    ui.Image image = await boundary.toImage(pixelRatio: 4);
 
     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     Uint8List? pngBytes = byteData?.buffer.asUint8List();
     return pngBytes;
   }
+
+  bool _printing = false;
 
   _print() async {
     bool isAvailable = await _bluetoothPrint.isAvailable;
@@ -87,25 +88,25 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!isOn) {
       return reset('Printer is on');
     }
+    setState(() {
+      _printing = true;
+    });
 
     Uint8List? data = await takePicture();
-    Map<String, dynamic> config = {};
-    List<LineText> list = List.empty(growable: true);
-    String base64Image = base64Encode(data!);
-    list.add(
-      LineText(
-          type: LineText.TYPE_IMAGE,
-          content: base64Image,
-          align: LineText.ALIGN_CENTER,
-          width: 540,
-          linefeed: 1),
-    );
-    _printing = true;
-    await _bluetoothPrint
-        .printReceipt(config, list)
-        .whenComplete(() => setState(() {
-              _printing = false;
-            }));
+    Timer(const Duration(seconds: 2), () async {
+      List<LineText> list = List.empty(growable: true);
+      String base64Image = base64Encode(data!);
+      list.add(
+        LineText(
+            type: LineText.TYPE_IMAGE,
+            content: base64Image,
+            align: LineText.ALIGN_CENTER,
+            width: 540,
+            linefeed: 1),
+      );
+
+      await _bluetoothPrint.printReceipt({}, list);
+    });
   }
 
   Future<void> initBluetooth() async {
@@ -114,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
     bool isConnected = await _bluetoothPrint.isConnected ?? false;
 
     _bluetoothPrint.state.listen((state) {
-      print('******************* current device status: $state');
+      // print('******************* current device status: $state');
       switch (state) {
         case BluetoothPrint.CONNECTED:
           setState(() {
@@ -164,14 +165,18 @@ class _MyHomePageState extends State<MyHomePage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  ElevatedButton(
-                    onPressed: !_connected
-                        ? null
-                        : _printing
-                            ? null
-                            : _print,
-                    child: const Text('Print'),
-                  ),
+                  _printing
+                      ? ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _printing = false;
+                            });
+                          },
+                          child: const Text('Finish'))
+                      : ElevatedButton(
+                          onPressed: !_connected ? null : _print,
+                          child: const Text('Print'),
+                        ),
                   ElevatedButton(
                     onPressed: _device != null && _device!.address != null
                         ? _connectDevice
