@@ -41,12 +41,10 @@ class _MyHomePageState extends State<MyHomePage> {
   final GlobalKey _globalKey = GlobalKey();
   bool _connected = false;
 
-  _scanDevices() {
-    _bluetoothPrint.startScan(timeout: const Duration(seconds: 3));
-  }
-
-  void _connectDevice() {
-    _bluetoothPrint.connect(_device!);
+  void _connectDevice() async {
+    if (_device != null && _device!.address != null) {
+      await _bluetoothPrint.connect(_device!);
+    } else {}
   }
 
   bool _printing = false;
@@ -82,10 +80,13 @@ class _MyHomePageState extends State<MyHomePage> {
             }));
   }
 
-  @override
-  void initState() {
-    super.initState();
+  Future<void> initBluetooth() async {
+    _bluetoothPrint.startScan(timeout: const Duration(seconds: 4));
+
+    bool isConnected = await _bluetoothPrint.isConnected ?? false;
+
     _bluetoothPrint.state.listen((state) {
+      print('******************* current device status: $state');
       switch (state) {
         case BluetoothPrint.CONNECTED:
           setState(() {
@@ -101,61 +102,105 @@ class _MyHomePageState extends State<MyHomePage> {
           break;
       }
     });
+
+    if (!mounted) return;
+
+    if (isConnected) {
+      setState(() {
+        _connected = true;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => initBluetooth());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Center(
-          child: Column(children: [
-            PrintView(globalKey: _globalKey),
-            ElevatedButton(
-              onPressed: _print,
-              child: const Text('Print'),
-            ),
-            ElevatedButton(
-              onPressed: !_connected
-                  ? null
-                  : _printing
-                      ? null
-                      : _print,
-              child: const Text('Print'),
-            ),
-            ElevatedButton(
-              onPressed: _device == null ? null : _connectDevice,
-              child: const Text('Connect'),
-            ),
-            StreamBuilder<List<BluetoothDevice>>(
-              stream: _bluetoothPrint.scanResults,
-              initialData: const [],
-              builder: (c, snapshot) => Column(
-                  children: snapshot.data
-                          ?.map((d) => ListTile(
-                                title: Text(d.name ?? ''),
-                                subtitle: Text(d.address ?? ''),
-                                onTap: () async {
-                                  setState(() {
-                                    _device = d;
-                                  });
-                                },
-                                trailing: _device?.address == d.address
-                                    ? const Icon(
-                                        Icons.check,
-                                        color: Colors.green,
-                                      )
-                                    : null,
-                              ))
-                          .toList() ??
-                      []),
-            )
-          ]),
+      body: RefreshIndicator(
+        onRefresh: () =>
+            _bluetoothPrint.startScan(timeout: const Duration(seconds: 4)),
+        child: SingleChildScrollView(
+          child: Center(
+            child: Column(children: [
+              PrintView(globalKey: _globalKey),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: !_connected
+                        ? null
+                        : _printing
+                            ? null
+                            : _print,
+                    child: const Text('Print'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _device != null && _device!.address != null
+                        ? _connectDevice
+                        : null,
+                    child: const Text('Connect'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _connected
+                        ? () async {
+                            await _bluetoothPrint.disconnect();
+                          }
+                        : null,
+                    child: const Text('Disconnect'),
+                  ),
+                ],
+              ),
+              StreamBuilder<List<BluetoothDevice>>(
+                stream: _bluetoothPrint.scanResults,
+                initialData: const [],
+                builder: (c, snapshot) => Column(
+                    children: snapshot.data
+                            ?.map((d) => ListTile(
+                                  title: Text(d.name ?? ''),
+                                  subtitle: Text(d.address ?? ''),
+                                  onTap: () async {
+                                    setState(() {
+                                      _device = d;
+                                    });
+                                  },
+                                  trailing: _device?.address == d.address
+                                      ? const Icon(
+                                          Icons.check,
+                                          color: Colors.green,
+                                        )
+                                      : null,
+                                ))
+                            .toList() ??
+                        []),
+              )
+            ]),
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _scanDevices,
-        tooltip: 'Scan',
-        child: const Icon(Icons.search),
+      floatingActionButton: StreamBuilder<bool>(
+        stream: _bluetoothPrint.isScanning,
+        initialData: false,
+        builder: (c, snapshot) {
+          if (snapshot.data == true) {
+            return FloatingActionButton(
+              onPressed: () => _bluetoothPrint.stopScan(),
+              backgroundColor: Colors.red,
+              child: const Icon(Icons.stop),
+            );
+          } else {
+            return FloatingActionButton(
+              child: const Icon(Icons.search),
+              onPressed: () => _bluetoothPrint.startScan(
+                timeout: const Duration(seconds: 4),
+              ),
+            );
+          }
+        },
       ),
     );
   }
