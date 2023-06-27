@@ -1,7 +1,7 @@
 class OrderItem {
-  final double price;
+  final int price;
   final int quantity;
-  final double discount;
+  final int discount;
 
   OrderItem(this.price, this.quantity, this.discount);
 

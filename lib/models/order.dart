@@ -2,13 +2,13 @@ import 'package:printy/models/item.dart';
 
 class Order {
   final int id;
-  final double amount;
-  final double? discount;
+  final int amount;
+  final int? discount;
   final String? customer;
   final String? phone;
   final String? address;
   final String? note;
-  final double? paid;
+  final int? paid;
   final String createdAt;
   final String? logo;
   final String? logoPhone;

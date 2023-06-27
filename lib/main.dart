@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
+import 'package:printy/models/order.dart';
 import 'package:printy/print_view.dart';
 
 void main() {
@@ -52,8 +53,9 @@ class _MyHomePageState extends State<MyHomePage> {
       TextEditingController(text: '');
 
   int _size = 560;
-  int _quantity = 2;
-  Map<String, dynamic> _order = {};
+  int _quantity = 4;
+  Order? _order;
+  String? _text;
 
   String _statusText = 'Disconnected';
 
@@ -182,12 +184,32 @@ class _MyHomePageState extends State<MyHomePage> {
             child: SizedBox(
               width: 360.toDouble(),
               child: Column(children: [
-                _printTarget != null
-                    ? Image.memory(_printTarget!)
-                    : PrintView(
-                        globalKey: _globalKey,
-                        order: _order,
-                      ),
+                if (_order != null)
+                  _printTarget != null
+                      ? Image.memory(_printTarget!)
+                      : PrintView(
+                          globalKey: _globalKey,
+                          order: _order!,
+                        ),
+                if (_text != null)
+                  _printTarget != null
+                      ? Image.memory(_printTarget!)
+                      : RepaintBoundary(
+                          key: _globalKey,
+                          child: Container(
+                            decoration:
+                                const BoxDecoration(color: Colors.white),
+                            child: Row(
+                              children: [
+                                Flexible(
+                                    child: Text(
+                                  _text!,
+                                  style: const TextStyle(fontSize: 20),
+                                )),
+                              ],
+                            ),
+                          ),
+                        ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [Text(_statusText)],
@@ -213,7 +235,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                 child: const Text('Print'),
                               )
                             : ElevatedButton(
-                                onPressed: _order.isEmpty ? null : _prepare,
+                                onPressed: _order == null && _text == null
+                                    ? null
+                                    : _prepare,
                                 child: const Text('Prepare'),
                               ),
                     ElevatedButton(
@@ -306,17 +330,19 @@ class _MyHomePageState extends State<MyHomePage> {
                           Map<String, dynamic> result =
                               json.decode(_inputController.value.text);
                           setState(() {
-                            _order = result;
+                            _order = Order.fromJson(result);
+                            _text = null;
                           });
-                        } on FormatException {
+                        } catch (_) {
                           setState(() {
-                            _order = {"text": _inputController.text};
+                            _order = null;
+                            _text = _inputController.text;
                           });
                         }
                         setState(() {
                           _printTarget = null;
+                          _inputController.text = '';
                         });
-                        _inputController.text = '';
                       },
                       icon: const Icon(Icons.add_sharp),
                     )

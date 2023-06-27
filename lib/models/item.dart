@@ -3,7 +3,7 @@ import 'package:printy/models/order_item.dart';
 class Item {
   final int id;
   final String name;
-  final double price;
+  final int price;
   final OrderItem orderItem;
 
   Item(this.id, this.name, this.price, this.orderItem);
