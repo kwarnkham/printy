@@ -54,20 +54,17 @@ class _PrintViewState extends State<PrintView> {
                         flex: 1,
                         child: Row(children: [
                           const Icon(Icons.person),
-                          Text(widget.order.customer!)
+                          Flexible(child: Text(widget.order.customer!))
                         ]),
                       ),
                 widget.order.phone == null
                     ? const SizedBox.shrink()
-                    : Expanded(
-                        flex: 1,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            const Icon(Icons.phone),
-                            Text(widget.order.phone!)
-                          ],
-                        ),
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Icon(Icons.phone),
+                          Text(widget.order.phone!)
+                        ],
                       ),
               ],
             ),
@@ -78,11 +75,12 @@ class _PrintViewState extends State<PrintView> {
                   flex: 1,
                   child: Row(children: [
                     const Icon(Icons.numbers),
-                    Text(widget.order.id.toString())
+                    Flexible(
+                      child: Text(widget.order.id.toString()),
+                    )
                   ]),
                 ),
                 Expanded(
-                  flex: 1,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -160,7 +158,8 @@ class _PrintViewState extends State<PrintView> {
                       Expanded(
                         flex: 2,
                         child: Text(
-                          (item.orderItem.price - item.orderItem.discount)
+                          (item.orderItem.price -
+                                  (item.orderItem.discount ?? 0))
                               .toString(),
                           textAlign: TextAlign.end,
                         ),
@@ -171,7 +170,8 @@ class _PrintViewState extends State<PrintView> {
                       Expanded(
                         flex: 2,
                         child: Text(
-                            ((item.orderItem.price - item.orderItem.discount) *
+                            ((item.orderItem.price -
+                                        (item.orderItem.discount ?? 0)) *
                                     item.orderItem.quantity)
                                 .toString(),
                             textAlign: TextAlign.end),
@@ -211,7 +211,7 @@ class _PrintViewState extends State<PrintView> {
                             : widget.order.items.fold(0, (carry, item) {
                                 return (item.orderItem.quantity *
                                             (item.orderItem.price -
-                                                item.orderItem.discount))
+                                                (item.orderItem.discount ?? 0)))
                                         .toInt() +
                                     carry;
                                 // return carry +

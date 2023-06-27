@@ -1,7 +1,7 @@
 import 'package:printy/models/item.dart';
 
 class Order {
-  final int id;
+  final String id;
   final int amount;
   final int? discount;
   final String? customer;
@@ -30,7 +30,7 @@ class Order {
   );
 
   Order.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
+      : id = json['id'].toString(),
         amount = json['amount'],
         discount = json['discount'],
         customer = json['customer'],
