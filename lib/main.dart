@@ -53,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   int _size = 560;
   int _quantity = 2;
+  Map<String, dynamic> _order = {};
 
   String _statusText = 'Disconnected';
 
@@ -171,7 +172,10 @@ class _MyHomePageState extends State<MyHomePage> {
             child: SizedBox(
               width: 360.toDouble(),
               child: Column(children: [
-                PrintView(globalKey: _globalKey),
+                PrintView(
+                  globalKey: _globalKey,
+                  order: _order,
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [Text(_statusText)],
@@ -281,8 +285,14 @@ class _MyHomePageState extends State<MyHomePage> {
                           Map<String, dynamic> result =
                               json.decode(_inputController.text);
                           print(result);
+                          setState(() {
+                            _order = result;
+                          });
                         } on FormatException {
                           print(_inputController.text);
+                          setState(() {
+                            _order = {"text": _inputController.text};
+                          });
                         }
                       },
                       icon: const Icon(Icons.add_sharp),
