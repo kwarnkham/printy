@@ -77,6 +77,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   bool _printing = false;
+  Uint8List? _printTarget;
+
+  _prepare() async {
+    Uint8List? data = await takePicture();
+    setState(() {
+      _printTarget = data;
+    });
+  }
 
   _print() async {
     bool isAvailable = await _bluetoothPrint.isAvailable;
@@ -95,29 +103,31 @@ class _MyHomePageState extends State<MyHomePage> {
     if (!isOn) {
       return reset('Printer is on');
     }
+
+    if (_printTarget == null) {
+      return reset('No print data yet');
+    }
+
     setState(() {
       _printing = true;
     });
 
-    Uint8List? data = await takePicture();
-    Timer(const Duration(seconds: 2), () async {
-      List<LineText> list = List.empty(growable: true);
-      String base64Image = base64Encode(data!);
-      list.add(
-        LineText(
-            type: LineText.TYPE_IMAGE,
-            content: base64Image,
-            align: LineText.ALIGN_CENTER,
-            width: _size,
-            linefeed: 1),
-      );
+    List<LineText> list = List.empty(growable: true);
+    String base64Image = base64Encode(_printTarget!);
+    list.add(
+      LineText(
+          type: LineText.TYPE_IMAGE,
+          content: base64Image,
+          align: LineText.ALIGN_CENTER,
+          width: _size,
+          linefeed: 1),
+    );
 
-      await _bluetoothPrint.printReceipt({}, list);
+    await _bluetoothPrint.printReceipt({}, list);
 
-      Timer(const Duration(seconds: 6), () {
-        setState(() {
-          _printing = false;
-        });
+    Timer(const Duration(seconds: 10), () {
+      setState(() {
+        _printing = false;
       });
     });
   }
@@ -172,10 +182,12 @@ class _MyHomePageState extends State<MyHomePage> {
             child: SizedBox(
               width: 360.toDouble(),
               child: Column(children: [
-                PrintView(
-                  globalKey: _globalKey,
-                  order: _order,
-                ),
+                _printTarget != null
+                    ? Image.memory(_printTarget!)
+                    : PrintView(
+                        globalKey: _globalKey,
+                        order: _order,
+                      ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [Text(_statusText)],
@@ -191,10 +203,19 @@ class _MyHomePageState extends State<MyHomePage> {
                               });
                             },
                             child: const Text('Finish'))
-                        : ElevatedButton(
-                            onPressed: !_connected ? null : _print,
-                            child: const Text('Print'),
-                          ),
+                        : _printTarget != null
+                            ? ElevatedButton(
+                                onPressed: !_connected
+                                    ? null
+                                    : _printTarget == null
+                                        ? null
+                                        : _print,
+                                child: const Text('Print'),
+                              )
+                            : ElevatedButton(
+                                onPressed: _order.isEmpty ? null : _prepare,
+                                child: const Text('Prepare'),
+                              ),
                     ElevatedButton(
                       onPressed: _device != null && _device!.address != null
                           ? _connectDevice
@@ -284,7 +305,6 @@ class _MyHomePageState extends State<MyHomePage> {
                         try {
                           Map<String, dynamic> result =
                               json.decode(_inputController.value.text);
-                          print(result['order']);
                           setState(() {
                             _order = result;
                           });
@@ -293,6 +313,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             _order = {"text": _inputController.text};
                           });
                         }
+                        setState(() {
+                          _printTarget = null;
+                        });
                         _inputController.text = '';
                       },
                       icon: const Icon(Icons.add_sharp),
@@ -327,26 +350,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ),
       ),
-      // floatingActionButton: StreamBuilder<bool>(
-      //   stream: _bluetoothPrint.isScanning,
-      //   initialData: false,
-      //   builder: (c, snapshot) {
-      //     if (snapshot.data == true) {
-      //       return FloatingActionButton(
-      //         onPressed: () => _bluetoothPrint.stopScan(),
-      //         backgroundColor: Colors.red,
-      //         child: const Icon(Icons.stop),
-      //       );
-      //     } else {
-      //       return FloatingActionButton(
-      //         child: const Icon(Icons.search),
-      //         onPressed: () => _bluetoothPrint.startScan(
-      //           timeout: const Duration(seconds: 4),
-      //         ),
-      //       );
-      //     }
-      //   },
-      // ),
     );
   }
 }
