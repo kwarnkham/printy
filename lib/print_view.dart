@@ -171,10 +171,9 @@ class _PrintViewState extends State<PrintView> {
                       Expanded(
                         flex: 2,
                         child: Text(
-                            (
-                              (item.orderItem.price - item.orderItem.discount) *
-                                  item.orderItem.quantity,
-                            ).toString(),
+                            ((item.orderItem.price - item.orderItem.discount) *
+                                    item.orderItem.quantity)
+                                .toString(),
                             textAlign: TextAlign.end),
                       ),
                     ],
