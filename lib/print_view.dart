@@ -30,38 +30,46 @@ class _PrintViewState extends State<PrintView> {
     return RepaintBoundary(
       key: widget.globalKey,
       child: widget.order.isEmpty
-          ? const SizedBox()
+          ? const SizedBox.shrink()
           : widget.order.containsKey('text')
               ? Text(widget.order['text'])
               : Container(
                   decoration: const BoxDecoration(color: Colors.white),
                   child: Column(
                     children: [
-                      Image.network(widget.order['logo']),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [Text(widget.order['logo_phone'])],
-                      ),
+                      widget.order['logo'] != null
+                          ? Image.network(widget.order['logo'])
+                          : const SizedBox.shrink(),
+                      widget.order['logo_phone'] != null
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [Text(widget.order['logo_phone'])],
+                            )
+                          : const SizedBox.shrink(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(
-                            flex: 1,
-                            child: Row(children: [
-                              const Icon(Icons.person),
-                              Text(widget.order['customer'])
-                            ]),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                const Icon(Icons.phone),
-                                Text(widget.order['phone'])
-                              ],
-                            ),
-                          ),
+                          widget.order['customer'] == null
+                              ? const SizedBox.shrink()
+                              : Expanded(
+                                  flex: 1,
+                                  child: Row(children: [
+                                    const Icon(Icons.person),
+                                    Text(widget.order['customer'])
+                                  ]),
+                                ),
+                          widget.order['phone'] == null
+                              ? const SizedBox.shrink()
+                              : Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      const Icon(Icons.phone),
+                                      Text(widget.order['phone'])
+                                    ],
+                                  ),
+                                ),
                         ],
                       ),
                       Row(
@@ -74,33 +82,37 @@ class _PrintViewState extends State<PrintView> {
                               Text(widget.order['id'].toString())
                             ]),
                           ),
-                          Expanded(
-                            flex: 1,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                const Icon(Icons.calendar_month),
-                                Flexible(
-                                  child: Text(
-                                    DateFormat('dd/MM/yyyy').format(
-                                        DateTime.parse(
-                                            widget.order['created_at'])),
-                                    textAlign: TextAlign.right,
+                          widget.order['created_at'] == null
+                              ? const SizedBox.shrink()
+                              : Expanded(
+                                  flex: 1,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      const Icon(Icons.calendar_month),
+                                      Flexible(
+                                        child: Text(
+                                          DateFormat('dd/MM/yyyy').format(
+                                              DateTime.parse(
+                                                  widget.order['created_at'])),
+                                          textAlign: TextAlign.right,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
+                        ],
+                      ),
+                      widget.order['address'] == null
+                          ? const SizedBox.shrink()
+                          : Row(
+                              children: [
+                                const Icon(Icons.location_pin),
+                                Flexible(
+                                  child: Text(widget.order['address']),
+                                )
                               ],
                             ),
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          const Icon(Icons.location_pin),
-                          Flexible(
-                            child: Text(widget.order['address']),
-                          )
-                        ],
-                      ),
                       const Divider(),
                       const Row(
                         children: [
@@ -137,47 +149,44 @@ class _PrintViewState extends State<PrintView> {
                         ],
                       ),
                       const Divider(),
-                      ...widget.order['a_items'].map((item) {
-                        return Container(
-                          padding: const EdgeInsets.only(top: 2, bottom: 2),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                flex: 4,
-                                child: Text(item['name']),
-                              ),
-                              Expanded(
-                                flex: 2,
-                                child: Text(
-                                  (item['pivot']['price'] -
-                                          item['pivot']['discount'])
-                                      .toString(),
-                                  textAlign: TextAlign.end,
+                      if (widget.order['a_items'] == null)
+                        const SizedBox.shrink()
+                      else
+                        ...widget.order['a_items'].map((item) {
+                          return Container(
+                            padding: const EdgeInsets.only(top: 2, bottom: 2),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: 4,
+                                  child: Text(item['name']),
                                 ),
-                              ),
-                              Expanded(
+                                Expanded(
+                                  flex: 2,
                                   child: Text(
-                                      item['pivot']['quantity'].toString(),
-                                      textAlign: TextAlign.end)),
-                              Expanded(
-                                flex: 2,
-                                // child: Text(
-                                //     ((item['pivot']['price'] -
-                                //                 item['pivot']['quantity']) *
-                                //             item['pivot']['quantity'])
-                                //         .toString(),
-                                //     textAlign: TextAlign.end),
-                                child: Text(
-                                    ((item['pivot']['price'] -
-                                                item['pivot']['discount']) *
-                                            item['pivot']['quantity'])
+                                    (item['pivot']['price'] -
+                                            item['pivot']['discount'])
                                         .toString(),
-                                    textAlign: TextAlign.end),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
+                                    textAlign: TextAlign.end,
+                                  ),
+                                ),
+                                Expanded(
+                                    child: Text(
+                                        item['pivot']['quantity'].toString(),
+                                        textAlign: TextAlign.end)),
+                                Expanded(
+                                  flex: 2,
+                                  child: Text(
+                                      ((item['pivot']['price'] -
+                                                  item['pivot']['discount']) *
+                                              item['pivot']['quantity'])
+                                          .toString(),
+                                      textAlign: TextAlign.end),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
                       const Divider(),
                       Container(
                         padding: const EdgeInsets.only(top: 2, bottom: 2),
@@ -237,7 +246,8 @@ class _PrintViewState extends State<PrintView> {
                             ),
                             Expanded(
                               flex: 2,
-                              child: Text(widget.order['paid'].toString(),
+                              child: Text(
+                                  (widget.order['paid'] ?? 0).toString(),
                                   textAlign: TextAlign.end),
                             ),
                           ],
@@ -256,7 +266,8 @@ class _PrintViewState extends State<PrintView> {
                             ),
                             Expanded(
                               flex: 2,
-                              child: Text(widget.order['discount'].toString(),
+                              child: Text(
+                                  (widget.order['discount'] ?? 0).toString(),
                                   textAlign: TextAlign.end),
                             ),
                           ],
@@ -278,15 +289,15 @@ class _PrintViewState extends State<PrintView> {
                               flex: 2,
                               child: Text(
                                   (widget.order['amount'] -
-                                          widget.order['paid'])
+                                          (widget.order['paid'] ?? 0))
                                       .toString(),
                                   textAlign: TextAlign.end),
                             ),
                           ],
                         ),
                       ),
-                      widget.order['note'] == ''
-                          ? const SizedBox()
+                      widget.order['note'] == null
+                          ? const SizedBox.shrink()
                           : Row(
                               children: [
                                 const Text('Note :'),
@@ -302,10 +313,15 @@ class _PrintViewState extends State<PrintView> {
                       const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            'Thank You',
-                            textAlign: TextAlign.center,
-                          )
+                          Expanded(child: Divider()),
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              'Thank You',
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          Expanded(child: Divider())
                         ],
                       )
                     ],

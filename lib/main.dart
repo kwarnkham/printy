@@ -283,17 +283,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       onPressed: () {
                         try {
                           Map<String, dynamic> result =
-                              json.decode(_inputController.text);
-                          print(result);
+                              json.decode(_inputController.value.text);
+                          print(result['order']);
                           setState(() {
                             _order = result;
                           });
                         } on FormatException {
-                          print(_inputController.text);
                           setState(() {
                             _order = {"text": _inputController.text};
                           });
                         }
+                        _inputController.text = '';
                       },
                       icon: const Icon(Icons.add_sharp),
                     )
