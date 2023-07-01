@@ -8,10 +8,17 @@ import 'dart:ui' as ui;
 import 'package:flutter/rendering.dart';
 import 'package:printy/models/order.dart';
 import 'package:printy/print_view.dart';
+import 'package:go_router/go_router.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+final router = GoRouter(
+  routes: [
+    GoRoute(
+      path: 'details',
+      builder: (_, __) => const MyApp(),
+    ),
+  ],
+);
+void main() => runApp(MaterialApp.router(routerConfig: router));
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
