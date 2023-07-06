@@ -315,8 +315,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
                 TextField(
                   controller: _inputController,
-                  maxLines: null,
-                  keyboardType: TextInputType.multiline,
+                  autofocus: true,
                   decoration: const InputDecoration(
                     hintText: 'Print Data',
                   ),
