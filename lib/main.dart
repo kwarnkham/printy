@@ -13,28 +13,21 @@ import 'package:go_router/go_router.dart';
 final router = GoRouter(
   routes: [
     GoRoute(
-      path: 'details',
-      builder: (_, __) => const MyApp(),
+      path: '/',
+      builder: (_, __) => const MyHomePage(),
     ),
   ],
 );
-void main() => runApp(MaterialApp.router(routerConfig: router));
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Printy',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+void main() => runApp(
+      MaterialApp.router(
+        routerConfig: router,
+        title: 'Printy',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
       ),
-      home: const MyHomePage(),
     );
-  }
-}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
