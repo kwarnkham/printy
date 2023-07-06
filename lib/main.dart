@@ -68,6 +68,25 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _processInput() {
+    try {
+      Map<String, dynamic> result = json.decode(_inputController.value.text);
+      setState(() {
+        _order = Order.fromJson(result);
+        _text = null;
+      });
+    } catch (_) {
+      setState(() {
+        _order = null;
+        _text = _inputController.text;
+      });
+    }
+    setState(() {
+      _printTarget = null;
+      _inputController.text = '';
+    });
+  }
+
   Future<Uint8List?> takePicture() async {
     RenderRepaintBoundary boundary =
         _globalKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
@@ -134,6 +153,14 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _getClipboardText() async {
+    final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+    setState(() {
+      _inputController.text = clipboardData?.text ?? '';
+    });
+    _processInput();
+  }
+
   Future<void> initBluetooth() async {
     _bluetoothPrint.startScan(timeout: const Duration(seconds: 4));
 
@@ -169,7 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-
+    _getClipboardText();
     WidgetsBinding.instance.addPostFrameCallback((_) => initBluetooth());
   }
 
@@ -324,25 +351,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     IconButton(
-                      onPressed: () {
-                        try {
-                          Map<String, dynamic> result =
-                              json.decode(_inputController.value.text);
-                          setState(() {
-                            _order = Order.fromJson(result);
-                            _text = null;
-                          });
-                        } catch (_) {
-                          setState(() {
-                            _order = null;
-                            _text = _inputController.text;
-                          });
-                        }
-                        setState(() {
-                          _printTarget = null;
-                          _inputController.text = '';
-                        });
-                      },
+                      onPressed: _processInput,
                       icon: const Icon(Icons.add_sharp),
                     )
                   ],
