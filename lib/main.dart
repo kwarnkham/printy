@@ -37,7 +37,7 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   final BluetoothPrint _bluetoothPrint = BluetoothPrint.instance;
 
   BluetoothDevice? _device;
@@ -195,10 +195,26 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      Timer(const Duration(seconds: 1), () {
+        _getClipboardText();
+      });
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
     _getClipboardText();
     WidgetsBinding.instance.addPostFrameCallback((_) => initBluetooth());
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
