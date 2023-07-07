@@ -17,6 +17,7 @@ final router = GoRouter(
       builder: (_, __) => const MyHomePage(),
     ),
   ],
+  debugLogDiagnostics: true,
 );
 void main() => runApp(
       MaterialApp.router(
@@ -203,6 +204,15 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Printy'),
+        backgroundColor: Colors.deepPurple,
+        titleTextStyle: const TextStyle(
+          color: Colors.white,
+          fontSize: 18,
+          fontStyle: FontStyle.italic,
+        ),
+      ),
       body: RefreshIndicator(
         onRefresh: () =>
             _bluetoothPrint.startScan(timeout: const Duration(seconds: 4)),
